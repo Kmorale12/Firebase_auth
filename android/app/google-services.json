@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "971729347463",
+    "project_id": "authentication-af768",
+    "storage_bucket": "authentication-af768.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971729347463:android:e550be4915e2c4cb8f2922",
+        "android_client_info": {
+          "package_name": "com.example.firebase_auth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARYnXa4kkJY-t5b0AxxG-i4WIloVm5EaE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
