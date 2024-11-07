@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'auth_service.dart'; // Import the AuthService class
+import 'home_page.dart'; // Import the HomePage class
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,33 +35,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final AuthService _authService = AuthService(); // Use AuthService
 
-void _signOut() async {
-  await _authService.signOut();
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('You have signed out successfully'),
-    ));
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Sign out failed'),
-    ));
-  }
-}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: <Widget>[
-          ElevatedButton(
-            onPressed: () {
-              _signOut();
-            },
-            child: Text('Sign Out'),
-          ),
-        ],
       ),
       body: Center(
         child: Column(
@@ -185,6 +164,13 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
       _userEmail = _emailController.text;
       _initialState = false;
     });
+    if (_success) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => HomePage(authService: widget.authService),
+        ),
+      );
+    }
   }
 
   @override
