@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
+import 'auth_service.dart'; // Import the AuthService class
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,14 +32,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance; // main logic for sign out
+  final AuthService _authService = AuthService(); // Use AuthService
 
-  void _signOut() async {
-    await _auth.signOut();
+void _signOut() async {
+  await _authService.signOut();
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Signed out successfully'),
+      content: Text('You have signed out successfully'),
+    ));
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Sign out failed'),
     ));
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               _signOut();
             },
-            child: Text('Sign Out'),//build ui
+            child: Text('Sign Out'),
           ),
         ],
       ),
@@ -58,8 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            RegisterEmailSection(auth: _auth),
-            EmailPasswordForm(auth: _auth),
+            RegisterEmailSection(authService: _authService),
+            EmailPasswordForm(authService: _authService),
           ],
         ),
       ),
@@ -68,8 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class RegisterEmailSection extends StatefulWidget {
-  RegisterEmailSection({Key? key, required this.auth}) : super(key: key);
-  final FirebaseAuth auth;
+  RegisterEmailSection({Key? key, required this.authService}) : super(key: key);
+  final AuthService authService;
 
   @override
   _RegisterEmailSectionState createState() => _RegisterEmailSectionState();
@@ -84,22 +92,15 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
   String? _userEmail;
 
   void _register() async {
-    try {
-      await widget.auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      setState(() {
-        _success = true;
-        _userEmail = _emailController.text;
-        _initialState = false;
-      });
-    } catch (e) {
-      setState(() {
-        _success = false;
-        _initialState = false;
-      });
-    }
+    User? user = await widget.authService.registerWithEmailAndPassword(
+      _emailController.text,
+      _passwordController.text,
+    );
+    setState(() {
+      _success = user != null;
+      _userEmail = _emailController.text;
+      _initialState = false;
+    });
   }
 
   @override
@@ -159,8 +160,8 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
 }
 
 class EmailPasswordForm extends StatefulWidget {
-  EmailPasswordForm({Key? key, required this.auth}) : super(key: key);
-  final FirebaseAuth auth;
+  EmailPasswordForm({Key? key, required this.authService}) : super(key: key);
+  final AuthService authService;
 
   @override
   _EmailPasswordFormState createState() => _EmailPasswordFormState();
@@ -175,22 +176,15 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
   String _userEmail = '';
 
   void _signInWithEmailAndPassword() async {
-    try {
-      await widget.auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      setState(() {
-        _success = true;
-        _userEmail = _emailController.text;
-        _initialState = false;
-      });
-    } catch (e) {
-      setState(() {
-        _success = false;
-        _initialState = false;
-      });
-    }
+    User? user = await widget.authService.signInWithEmailAndPassword(
+      _emailController.text,
+      _passwordController.text,
+    );
+    setState(() {
+      _success = user != null;
+      _userEmail = _emailController.text;
+      _initialState = false;
+    });
   }
 
   @override
